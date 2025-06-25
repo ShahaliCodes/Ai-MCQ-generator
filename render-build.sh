@@ -8,11 +8,10 @@ apt-get install -y \
     zlib1g-dev \
     tesseract-ocr \
     libtesseract-dev \
-    python3.11-dev
-
-# Ensure we're using Python 3.11
-update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
-update-alternatives --set python3 /usr/bin/python3.11
+    python3.11-dev \
+    libxml2-dev \
+    libxslt-dev \
+    libffi-dev
 
 # Install Python dependencies
 python3.11 -m pip install --upgrade pip
