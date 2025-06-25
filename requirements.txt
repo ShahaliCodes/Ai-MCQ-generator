@@ -1,0 +1,15 @@
+fastapi==0.95.2
+uvicorn==0.22.0
+python-multipart==0.0.6
+python-docx==0.8.11
+pypdf2==3.0.1
+pandas==2.0.2
+openai==0.27.8
+pillow==10.0.0
+pytesseract==0.3.10
+supabase==2.3.1
+python-dotenv==1.0.0
+python-pptx==0.6.21
+xlrd==2.0.1
+python-magic==0.4.27
+loguru==0.7.0
