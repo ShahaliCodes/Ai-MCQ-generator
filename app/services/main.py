@@ -6,14 +6,6 @@ from app.services.file_processing import process_uploaded_file
 from app.services.question_generation import generate_questions_from_content
 from app.services.storage import upload_file_to_supabase
 from app.schemas import QuestionSet
-import logging
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -36,7 +28,7 @@ app.add_middleware(
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "version": "1.0.0"}
+    return {"status": "healthy"}
 
 @app.post("/upload/", response_model=QuestionSet)
 async def upload_file(file: UploadFile = File(...)):
@@ -53,15 +45,11 @@ async def upload_file(file: UploadFile = File(...)):
                 detail=f"File too large. Max size is {max_size/1024/1024}MB"
             )
 
-        logger.info(f"Processing file: {file.filename}")
-        
         # 1. Upload file to Supabase storage
         file_url = await upload_file_to_supabase(file)
-        logger.info(f"File uploaded to: {file_url}")
         
         # 2. Process file and extract text content
         content = await process_uploaded_file(file)
-        logger.info(f"Extracted content length: {len(content)}")
         
         if not content or len(content.strip()) < 50:
             raise HTTPException(
@@ -71,18 +59,15 @@ async def upload_file(file: UploadFile = File(...)):
         
         # 3. Generate questions from content
         questions = await generate_questions_from_content(content)
-        logger.info(f"Generated {len(questions)} questions")
         
         return {
             "file_url": file_url,
             "questions": questions,
             "original_filename": file.filename
         }
-    except HTTPException as he:
-        logger.error(f"HTTP error: {he.detail}")
+    except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(
             status_code=500,
             detail=f"Error processing file: {str(e)}"
