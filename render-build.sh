@@ -1,16 +1,19 @@
 #!/bin/bash
 set -o errexit
 
-# Install Python dependencies only (no system packages)
+# Install Python dependencies
 echo "Installing Python dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# Configure pytesseract to use system tesseract if available
-echo "Configuring pytesseract..."
+# Configure pytesseract fallback
+echo "Configuring pytesseract fallback..."
 if ! command -v tesseract &> /dev/null; then
-    echo "Tesseract OCR not found - image text extraction will be disabled"
-    # Create a dummy tesseract command to prevent errors
-    echo 'echo "Tesseract not installed" >&2; exit 1' > /usr/local/bin/tesseract
-    chmod +x /usr/local/bin/tesseract
+    echo "WARNING: Tesseract OCR not found - image text extraction will be disabled"
+    # Create a local dummy script that will be used by pytesseract
+    mkdir -p ./.tesseract_fallback
+    echo 'echo "Tesseract OCR is not available in this environment" >&2' > ./.tesseract_fallback/tesseract
+    echo 'exit 1' >> ./.tesseract_fallback/tesseract
+    chmod +x ./.tesseract_fallback/tesseract
+    export TESSERACT_CMD=$PWD/.tesseract_fallback/tesseract
 fi
