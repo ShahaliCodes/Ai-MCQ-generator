@@ -1,20 +1,16 @@
 #!/bin/bash
 set -o errexit
 
-# Use Render's package cache instead of trying to update
+# Install Python dependencies only (no system packages)
 echo "Installing Python dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# Install Tesseract OCR if needed (using Render's available packages)
+# Configure pytesseract to use system tesseract if available
+echo "Configuring pytesseract..."
 if ! command -v tesseract &> /dev/null; then
-    echo "Installing Tesseract OCR..."
-    curl -L https://github.com/tesseract-ocr/tesseract/archive/refs/tags/5.3.2.tar.gz | tar xz
-    cd tesseract-5.3.2
-    ./autogen.sh
-    ./configure
-    make
-    make install
-    ldconfig
-    cd ..
+    echo "Tesseract OCR not found - image text extraction will be disabled"
+    # Create a dummy tesseract command to prevent errors
+    echo 'echo "Tesseract not installed" >&2; exit 1' > /usr/local/bin/tesseract
+    chmod +x /usr/local/bin/tesseract
 fi
