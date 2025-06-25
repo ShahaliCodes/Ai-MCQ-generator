@@ -105,4 +105,4 @@ def _parse_generated_questions(text: str) -> List[Question]:
     current_correct = None
     current_explanation = None
     
-    lines =
+    lines = content.splitlines()
